@@ -104,21 +104,9 @@ class SwiftlyNotice {
         let view = UIView(frame: frame)
         view.backgroundColor = _backgroundColorForNoticeType(type)
 
-        let label = UILabel(frame: frame)
-        
-        if isExtendedType(type) {
-            label.numberOfLines = 2
-        } else {
-            label.numberOfLines = 1
-        }
-
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textAlignment = NSTextAlignment.Center
-        label.font          = UIFont.systemFontOfSize(12)
-        label.textColor     = UIColor.whiteColor()
-        label.text          = message
-
+        let label = UILabel.messageLabel(frame: frame, noticeType: type, message: message)
         view.addSubview(label)
+        
         _setupLabelConstraints(item: label, to: view)
 
         if (isExtendedType(type) || displayTime < 0.1) {
@@ -131,6 +119,7 @@ class SwiftlyNotice {
             closeButtonView.addGestureRecognizer(hideWindowTapGesture)
 
             view.addSubview(closeButtonView)
+            
             _setupCloseButtonConstraints(item: closeButtonView, to: view)
         }
 
@@ -223,6 +212,26 @@ class CloseButtonView: UIView {
         strokeColor.setStroke()
         bezier2Path.lineWidth = 1
         bezier2Path.stroke()
+    }
+}
+
+extension UILabel {
+    static func messageLabel(frame frame: CGRect, noticeType: NoticeType, message: String) -> UILabel {
+        let label = UILabel(frame: frame)
+        
+        if SwiftlyNotice.shared.isExtendedType(noticeType) {
+            label.numberOfLines = 2
+        } else {
+            label.numberOfLines = 1
+        }
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = NSTextAlignment.Center
+        label.font          = UIFont.systemFontOfSize(12)
+        label.textColor     = UIColor.whiteColor()
+        label.text          = message
+        
+        return label
     }
 }
 
