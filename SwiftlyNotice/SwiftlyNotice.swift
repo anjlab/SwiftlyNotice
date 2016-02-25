@@ -119,10 +119,7 @@ class SwiftlyNotice {
         label.text          = message
 
         view.addSubview(label)
-        
-        view.addConstraint(NSLayoutConstraint(item: label, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1.0, constant: 15.0))
-        view.addConstraint(NSLayoutConstraint(item: label, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1.0, constant: -35.0))
-        view.addConstraint(NSLayoutConstraint(item: label, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1.0, constant: 0.0))
+        _setupLabelConstraints(item: label, to: view)
 
         if (isExtendedType(type) || displayTime < 0.1) {
             let closeButtonView = CloseButtonView(frame: CGRectMake(0, 0, 20, 20))
@@ -134,11 +131,7 @@ class SwiftlyNotice {
             closeButtonView.addGestureRecognizer(hideWindowTapGesture)
 
             view.addSubview(closeButtonView)
-            
-            view.addConstraint(NSLayoutConstraint(item: closeButtonView, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1.0, constant: 0.0))
-            view.addConstraint(NSLayoutConstraint(item: closeButtonView, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1.0, constant: -5.0))
-            view.addConstraint(NSLayoutConstraint(item: closeButtonView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 20.0))
-            view.addConstraint(NSLayoutConstraint(item: closeButtonView, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 20.0))
+            _setupCloseButtonConstraints(item: closeButtonView, to: view)
         }
 
         _window.windowLevel = UIWindowLevelStatusBar
@@ -155,11 +148,11 @@ class SwiftlyNotice {
             }) { finished in
                 if displayTime > 0.0 {
                     self._dispatch_after_delay(NSTimeInterval(displayTime), queue: dispatch_get_main_queue(), block: { _ in
-                        print(self._windows.count)
                         if self._windows.count != 0 {
                             if self._windows.count > 1 {
                                 self._windows.removeFirst()
                             } else {
+                                self._windows.removeAll()
                                 self._hideWindow()
                             }
                         }
@@ -175,7 +168,6 @@ class SwiftlyNotice {
                 self._window.transform = CGAffineTransformTranslate(self._window.transform, 0, -self._height)
             }) { finished in
                 self._window.hidden = true
-                self._windows.removeAll()
             }
     }
     
@@ -190,6 +182,19 @@ class SwiftlyNotice {
     private func _dispatch_after_delay(delay: NSTimeInterval, queue: dispatch_queue_t, block: dispatch_block_t) {
         let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
         dispatch_after(time, queue, block)
+    }
+    
+    private func _setupLabelConstraints(item item: AnyObject, to view: UIView) {
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .Leading, multiplier: 1.0, constant: 15.0))
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1.0, constant: -35.0))
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1.0, constant: 0.0))
+    }
+    
+    private func _setupCloseButtonConstraints(item item: AnyObject, to view: UIView) {
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .CenterY, relatedBy: .Equal, toItem: view, attribute: .CenterY, multiplier: 1.0, constant: 0.0))
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .Trailing, relatedBy: .Equal, toItem: view, attribute: .Trailing, multiplier: 1.0, constant: -5.0))
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 20.0))
+        view.addConstraint(NSLayoutConstraint(item: item, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: 20.0))
     }
 }
 
